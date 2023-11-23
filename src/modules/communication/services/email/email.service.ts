@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { IEmailService } from '@modules/communication/services/email/IEmailService';
-// import { MailerService } from '@nestjs-modules/mailer';
+import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 
-class MailerService {
-  // sendMail() {}
-}
 @Injectable()
 export class EmailService implements IEmailService {
   constructor(private readonly mailerService: MailerService) {}
