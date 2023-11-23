@@ -19,8 +19,6 @@ export class PrismaDatabaseErrorHandler implements IDatabaseErrorHandler {
     if (error instanceof PrismaClientKnownRequestError) {
       const exception = error as PrismaClientKnownRequestError;
       this.HandlePrismaClientKnownRequestError(exception);
-    } else if (error.name === 'NotFoundError') {
-      throw new DataNotFoundError(error.message);
     }
 
     throw error;
@@ -33,6 +31,9 @@ export class PrismaDatabaseErrorHandler implements IDatabaseErrorHandler {
       case PrismaError.UniqueConstraintViolation: {
         const msg = `${error.meta.target[0]} already in use`;
         throw new UniqueConstraintFailedError(error.meta.target[0], msg);
+      }
+      case PrismaError.RecordsNotFound: {
+        throw new DataNotFoundError(error.message);
       }
     }
   }
