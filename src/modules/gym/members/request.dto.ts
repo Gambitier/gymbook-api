@@ -64,7 +64,10 @@ class MemberPlan {
   @IsEnum(DiscountTypeEnum)
   discountType: DiscountTypeEnum;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: () => [MemberPlanPayment],
+    description: 'Array of Member Plans',
+  })
   @IsDefined()
   @IsArray()
   @ArrayMinSize(1, { message: 'payments should have a minimum length of 1' })
@@ -149,7 +152,10 @@ export class CreateMemberDto {
   @IsOptional()
   notes?: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: () => [MemberPlan],
+    description: 'Array of Member Plans',
+  })
   @IsDefined()
   @IsArray()
   @ArrayMinSize(1, { message: 'plans should have a minimum length of 1' })
