@@ -21,9 +21,9 @@ import { PrismaService } from 'src/prisma.service';
 /////////////////////////////////////////////////////////////////////////
 
 @ApiBearerAuth()
-@ApiTags('gyms')
+@ApiTags('plans')
 @Controller('gyms')
-export class GymController {
+export class PlanController {
   /**
    *
    */
