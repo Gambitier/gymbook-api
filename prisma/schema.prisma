@@ -57,6 +57,7 @@ model Gym {
   userId    String  @db.Uuid
   adminUser User    @relation(fields: [userId], references: [id])
   batches   Batch[]
+  plans     Plan[]
 }
 
 model Batch {
@@ -80,10 +81,12 @@ model Plan {
   name            String
   price           Float
   durationInMoths Int
+  gym             Gym          @relation(fields: [gymId], references: [id])
   createdAt       DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
   deleted         DateTime?    @db.Timestamptz(6)
   memebers        MemberPlan[]
+  gymId           String       @db.Uuid
 }
 
 model Time {
