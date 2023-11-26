@@ -63,6 +63,11 @@ export class MemeberController {
           dateOfJoing: dto.dateOfJoing,
           address: dto.address,
           notes: dto.notes,
+          gym: {
+            connect: {
+              id: params.gymId,
+            },
+          },
           plans: {
             create: {
               planId: plan.planId,
