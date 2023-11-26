@@ -1,6 +1,7 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
 import { CreateBatchDto } from '@modules/gym/batch/request.dto';
+import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
 import {
   Body,
   Controller,
@@ -43,9 +44,7 @@ export class BatchController {
   @Post(':gymId/batches')
   async create(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
     @Body() dto: CreateBatchDto,
   ): Promise<APIResponse> {
     try {
@@ -89,10 +88,7 @@ export class BatchController {
   @Put(':gymId/batches/:id')
   async update(
     @Param()
-    params: {
-      gymId: string;
-      id: string;
-    },
+    params: GymEntityIdParam,
     @Body() dto: CreateBatchDto,
   ): Promise<APIResponse> {
     try {
@@ -136,9 +132,7 @@ export class BatchController {
   @Get(':gymId/batches')
   async getAll(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._batchEntity.findMany({
@@ -165,10 +159,7 @@ export class BatchController {
   @Delete(':gymId/batches/:id')
   async delete(
     @Param()
-    params: {
-      gymId: string;
-      id: string;
-    },
+    params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._batchEntity.update({
