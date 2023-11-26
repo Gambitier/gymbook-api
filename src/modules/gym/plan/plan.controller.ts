@@ -11,6 +11,7 @@ import {
   Inject,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
@@ -61,6 +62,41 @@ export class GymController {
 
       const apiResponse: APIResponse = {
         message: 'Plan created successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @ApiBody({ type: CreatePlanDto })
+  @HttpCode(HttpStatus.OK)
+  @Put(':gymId/plans/:planId')
+  async updateGymPlan(
+    @Param()
+    params: {
+      gymId: string;
+      planId: string;
+    },
+    @Body() dto: CreatePlanDto,
+  ): Promise<APIResponse> {
+    try {
+      const entity = await this._planEntity.update({
+        where: {
+          id: params.planId,
+          gym: {
+            id: params.gymId,
+          },
+        },
+        data: {
+          ...dto,
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Plan updated successfully!',
         data: entity,
       };
 
