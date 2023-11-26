@@ -1,6 +1,5 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
-import { CreateBatchDto } from '@modules/gym/batch/request.dto';
 import { CreateMemberDto } from '@modules/gym/members/request.dto';
 import {
   Body,
@@ -12,7 +11,6 @@ import {
   Inject,
   Param,
   Post,
-  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { $Enums, Prisma } from '@prisma/client';
@@ -41,7 +39,7 @@ export class MemeberController {
 
   @ApiBody({ type: CreateMemberDto })
   @HttpCode(HttpStatus.CREATED)
-  @Post(':gymId/batches')
+  @Post(':gymId/members')
   async create(
     @Param()
     params: {
@@ -87,55 +85,7 @@ export class MemeberController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Batch created successfully!',
-        data: entity,
-      };
-
-      return apiResponse;
-    } catch (err) {
-      this._databaseErrorHandler.HandleError(err);
-    }
-  }
-
-  @ApiBody({ type: CreateBatchDto })
-  @HttpCode(HttpStatus.OK)
-  @Put(':gymId/batches/:id')
-  async update(
-    @Param()
-    params: {
-      gymId: string;
-      id: string;
-    },
-    @Body() dto: CreateBatchDto,
-  ): Promise<APIResponse> {
-    try {
-      const entity = await this._memberEntity.update({
-        where: {
-          id: params.id,
-          gym: {
-            id: params.gymId,
-          },
-        },
-        data: {
-          name: dto.name,
-          batchLimit: dto.batchLimit,
-          startTime: {
-            update: {
-              hour: dto.startTime.hour,
-              minute: dto.startTime.minute,
-            },
-          },
-          endTime: {
-            update: {
-              hour: dto.endTime.hour,
-              minute: dto.endTime.minute,
-            },
-          },
-        },
-      });
-
-      const apiResponse: APIResponse = {
-        message: 'Batch updated successfully!',
+        message: 'Member created successfully!',
         data: entity,
       };
 
@@ -146,7 +96,7 @@ export class MemeberController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':gymId/batches')
+  @Get(':gymId/members')
   async getAll(
     @Param()
     params: {
@@ -164,7 +114,7 @@ export class MemeberController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plans retrieved successfully!',
+        message: 'members retrieved successfully!',
         data: entity,
       };
 
@@ -175,7 +125,7 @@ export class MemeberController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':gymId/batches/:id')
+  @Delete(':gymId/members/:id')
   async delete(
     @Param()
     params: {
@@ -197,7 +147,44 @@ export class MemeberController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Batch deleted successfully!',
+        message: 'Member deleted successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':gymId/members/:id')
+  async getById(
+    @Param()
+    params: {
+      gymId: string;
+      id: string;
+    },
+  ): Promise<APIResponse> {
+    try {
+      const entity = await this._memberEntity.findFirstOrThrow({
+        where: {
+          id: params.id,
+          gym: {
+            id: params.gymId,
+          },
+        },
+        include: {
+          plans: {
+            include: {
+              payments: true,
+            },
+          },
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Member retrieved successfully!',
         data: entity,
       };
 
