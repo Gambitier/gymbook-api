@@ -1,7 +1,7 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
+import { CreateBatchDto } from '@modules/gym/batch/request.dto';
 import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
-import { CreatePlanDto } from '@modules/gym/plan/request.dto';
 import {
   Body,
   Controller,
@@ -22,35 +22,48 @@ import { PrismaService } from 'src/prisma.service';
 /////////////////////////////////////////////////////////////////////////
 
 @ApiBearerAuth()
-@ApiTags('plans')
+@ApiTags('batch')
 @Controller('gyms')
-export class PlanController {
+export class BatchController {
   /**
    *
    */
 
-  private _planEntity: Prisma.PlanDelegate<DefaultArgs>;
+  private _batchEntity: Prisma.BatchDelegate<DefaultArgs>;
 
   constructor(
     prismaService: PrismaService,
     @Inject(IDatabaseErrorHandler)
     private _databaseErrorHandler: IDatabaseErrorHandler,
   ) {
-    this._planEntity = prismaService.plan;
+    this._batchEntity = prismaService.batch;
   }
 
-  @ApiBody({ type: CreatePlanDto })
+  @ApiBody({ type: CreateBatchDto })
   @HttpCode(HttpStatus.CREATED)
-  @Post(':gymId/plans')
-  async createGymPlan(
+  @Post(':gymId/batches')
+  async create(
     @Param()
     params: GymIdParam,
-    @Body() dto: CreatePlanDto,
+    @Body() dto: CreateBatchDto,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.create({
+      const entity = await this._batchEntity.create({
         data: {
-          ...dto,
+          name: dto.name,
+          batchLimit: dto.batchLimit,
+          startTime: {
+            create: {
+              hour: dto.startTime.hour,
+              minute: dto.startTime.minute,
+            },
+          },
+          endTime: {
+            create: {
+              hour: dto.endTime.hour,
+              minute: dto.endTime.minute,
+            },
+          },
           gym: {
             connect: {
               id: params.gymId,
@@ -60,7 +73,7 @@ export class PlanController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan created successfully!',
+        message: 'Batch created successfully!',
         data: entity,
       };
 
@@ -70,16 +83,16 @@ export class PlanController {
     }
   }
 
-  @ApiBody({ type: CreatePlanDto })
+  @ApiBody({ type: CreateBatchDto })
   @HttpCode(HttpStatus.OK)
-  @Put(':gymId/plans/:id')
-  async updateGymPlan(
+  @Put(':gymId/batches/:id')
+  async update(
     @Param()
     params: GymEntityIdParam,
-    @Body() dto: CreatePlanDto,
+    @Body() dto: CreateBatchDto,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.update({
+      const entity = await this._batchEntity.update({
         where: {
           id: params.id,
           gym: {
@@ -87,12 +100,25 @@ export class PlanController {
           },
         },
         data: {
-          ...dto,
+          name: dto.name,
+          batchLimit: dto.batchLimit,
+          startTime: {
+            update: {
+              hour: dto.startTime.hour,
+              minute: dto.startTime.minute,
+            },
+          },
+          endTime: {
+            update: {
+              hour: dto.endTime.hour,
+              minute: dto.endTime.minute,
+            },
+          },
         },
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan updated successfully!',
+        message: 'Batch updated successfully!',
         data: entity,
       };
 
@@ -103,13 +129,13 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':gymId/plans')
-  async getAllGymPlans(
+  @Get(':gymId/batches')
+  async getAll(
     @Param()
     params: GymIdParam,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.findMany({
+      const entity = await this._batchEntity.findMany({
         where: {
           gym: {
             id: params.gymId,
@@ -130,13 +156,13 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':gymId/plans/:id')
-  async deleteGymPlan(
+  @Delete(':gymId/batches/:id')
+  async delete(
     @Param()
     params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.update({
+      const entity = await this._batchEntity.update({
         where: {
           id: params.id,
           gym: {
@@ -149,7 +175,7 @@ export class PlanController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan deleted successfully!',
+        message: 'Batch deleted successfully!',
         data: entity,
       };
 

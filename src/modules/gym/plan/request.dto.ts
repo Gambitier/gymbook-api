@@ -6,7 +6,7 @@ export class CreatePlanDto {
     Object.assign(this, props);
   }
 
-  @ApiProperty({ example: 1000 })
+  @ApiProperty({ example: 'Six month plan' })
   @IsString()
   name: string;
 

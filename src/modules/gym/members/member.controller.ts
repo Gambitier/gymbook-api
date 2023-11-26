@@ -1,7 +1,7 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
 import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
-import { CreatePlanDto } from '@modules/gym/plan/request.dto';
+import { CreateMemberDto } from '@modules/gym/members/request.dto';
 import {
   Body,
   Controller,
@@ -12,87 +12,84 @@ import {
   Inject,
   Param,
   Post,
-  Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma.service';
 
 /////////////////////////////////////////////////////////////////////////
 
 @ApiBearerAuth()
-@ApiTags('plans')
+@ApiTags('members')
 @Controller('gyms')
-export class PlanController {
+export class MemeberController {
   /**
    *
    */
 
-  private _planEntity: Prisma.PlanDelegate<DefaultArgs>;
+  private _memberEntity: Prisma.MemberDelegate<DefaultArgs>;
 
   constructor(
     prismaService: PrismaService,
     @Inject(IDatabaseErrorHandler)
     private _databaseErrorHandler: IDatabaseErrorHandler,
   ) {
-    this._planEntity = prismaService.plan;
+    this._memberEntity = prismaService.member;
   }
 
-  @ApiBody({ type: CreatePlanDto })
+  @ApiBody({ type: CreateMemberDto })
   @HttpCode(HttpStatus.CREATED)
-  @Post(':gymId/plans')
-  async createGymPlan(
+  @Post(':gymId/members')
+  async create(
     @Param()
     params: GymIdParam,
-    @Body() dto: CreatePlanDto,
+    @Body() dto: CreateMemberDto,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.create({
+      const plan = dto.plans[0];
+
+      const entity = await this._memberEntity.create({
         data: {
-          ...dto,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          mobile: dto.mobile,
+          countryShortCode: dto.countryShortCode,
+          countryCode: dto.countryCode,
+          email: dto.email,
+          dob: dto.dob,
+          gender: dto.gender,
+          dateOfJoing: dto.dateOfJoing,
+          address: dto.address,
+          notes: dto.notes,
           gym: {
             connect: {
               id: params.gymId,
+            },
+          },
+          plans: {
+            create: {
+              planId: plan.planId,
+              batchId: plan.batchId,
+              startDate: plan.startDate,
+              trainingType: plan.trainingType as $Enums.TrainingTypeEnum,
+              admissionFees: plan.admissionFees,
+              discount: plan.discount,
+              discountType: plan.discountType as $Enums.DiscountTypeEnum,
+              payments: {
+                createMany: {
+                  data: plan.payments.map((payment) => ({
+                    amountPaid: payment.amountPaid,
+                  })),
+                },
+              },
             },
           },
         },
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan created successfully!',
-        data: entity,
-      };
-
-      return apiResponse;
-    } catch (err) {
-      this._databaseErrorHandler.HandleError(err);
-    }
-  }
-
-  @ApiBody({ type: CreatePlanDto })
-  @HttpCode(HttpStatus.OK)
-  @Put(':gymId/plans/:id')
-  async updateGymPlan(
-    @Param()
-    params: GymEntityIdParam,
-    @Body() dto: CreatePlanDto,
-  ): Promise<APIResponse> {
-    try {
-      const entity = await this._planEntity.update({
-        where: {
-          id: params.id,
-          gym: {
-            id: params.gymId,
-          },
-        },
-        data: {
-          ...dto,
-        },
-      });
-
-      const apiResponse: APIResponse = {
-        message: 'Plan updated successfully!',
+        message: 'Member created successfully!',
         data: entity,
       };
 
@@ -103,13 +100,13 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get(':gymId/plans')
-  async getAllGymPlans(
+  @Get(':gymId/members')
+  async getAll(
     @Param()
     params: GymIdParam,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.findMany({
+      const entity = await this._memberEntity.findMany({
         where: {
           gym: {
             id: params.gymId,
@@ -119,7 +116,7 @@ export class PlanController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plans retrieved successfully!',
+        message: 'members retrieved successfully!',
         data: entity,
       };
 
@@ -130,13 +127,13 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':gymId/plans/:id')
-  async deleteGymPlan(
+  @Delete(':gymId/members/:id')
+  async delete(
     @Param()
     params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._planEntity.update({
+      const entity = await this._memberEntity.update({
         where: {
           id: params.id,
           gym: {
@@ -149,7 +146,41 @@ export class PlanController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan deleted successfully!',
+        message: 'Member deleted successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':gymId/members/:id')
+  async getById(
+    @Param()
+    params: GymEntityIdParam,
+  ): Promise<APIResponse> {
+    try {
+      const entity = await this._memberEntity.findFirstOrThrow({
+        where: {
+          id: params.id,
+          gym: {
+            id: params.gymId,
+          },
+        },
+        include: {
+          plans: {
+            include: {
+              payments: true,
+            },
+          },
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Member retrieved successfully!',
         data: entity,
       };
 

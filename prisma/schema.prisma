@@ -52,12 +52,18 @@ model User {
 }
 
 model Gym {
-  id        String  @id @default(uuid()) @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   name      String
-  userId    String  @db.Uuid
-  adminUser User    @relation(fields: [userId], references: [id])
+  userId    String    @db.Uuid
+  adminUser User      @relation(fields: [userId], references: [id])
   batches   Batch[]
   plans     Plan[]
+  members   Member[]
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deleted   DateTime? @db.Timestamptz(6)
+
+  @@unique([name, userId])
 }
 
 model Batch {
@@ -125,6 +131,8 @@ model Member {
   updatedAt        DateTime     @updatedAt @db.Timestamptz(6)
   deleted          DateTime?    @db.Timestamptz(6)
   plans            MemberPlan[]
+  gym              Gym          @relation(fields: [gymId], references: [id])
+  gymId            String       @db.Uuid
 }
 
 model MemberPlan {
