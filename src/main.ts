@@ -47,10 +47,7 @@ async function bootstrap() {
     .setTitle('API Docs')
     .setDescription('API Docs')
     .setVersion('1.0')
-    .addSecurity('basic', {
-      type: 'http',
-      scheme: 'bearer',
-    })
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
