@@ -44,8 +44,8 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '50mb', parameterLimit: 100 }));
 
   const config = new DocumentBuilder()
-    .setTitle('Nesjs ORM Examples')
-    .setDescription('Nesjs ORM Examples')
+    .setTitle('API Docs')
+    .setDescription('API Docs')
     .setVersion('1.0')
     .addSecurity('basic', {
       type: 'http',
