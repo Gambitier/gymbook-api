@@ -47,14 +47,108 @@ model User {
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
   deleted     DateTime?  @db.Timestamptz(6)
-
-  gyms      Gym[]
-  userRoles UserRole[]
+  gyms        Gym[]
+  userRoles   UserRole[]
 }
 
 model Gym {
-  id        String @id @default(uuid()) @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
   name      String
-  userId    String @db.Uuid
-  adminUser User   @relation(fields: [userId], references: [id])
+  userId    String  @db.Uuid
+  adminUser User    @relation(fields: [userId], references: [id])
+  batches   Batch[]
+}
+
+model Batch {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  batchLimit  Int
+  gymId       String       @db.Uuid
+  gym         Gym          @relation(fields: [gymId], references: [id])
+  startTime   Time         @relation("startTimeOfBatch", fields: [startTimeId], references: [id])
+  startTimeId Int          @unique
+  endTime     Time         @relation("endTimeOfBatch", fields: [endTimeId], references: [id])
+  endTimeId   Int          @unique
+  createdAt   DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(6)
+  deleted     DateTime?    @db.Timestamptz(6)
+  memebers    MemberPlan[]
+}
+
+model Plan {
+  id              String       @id @default(uuid()) @db.Uuid
+  name            String
+  price           Float
+  durationInMoths Int
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+  deleted         DateTime?    @db.Timestamptz(6)
+  memebers        MemberPlan[]
+}
+
+model Time {
+  id         Int    @id @default(autoincrement())
+  hour       Int
+  minute     Int
+  startBatch Batch? @relation("startTimeOfBatch")
+  endBatch   Batch? @relation("endTimeOfBatch")
+}
+
+enum TrainingTypeEnum {
+  GENERAL
+  PERSONAL
+}
+
+enum DiscountTypeEnum {
+  AMOUNT
+  PERCENTAGE
+}
+
+model Member {
+  id               String       @id @default(uuid()) @db.Uuid
+  membershipId     Int          @default(autoincrement())
+  firstName        String
+  lastName         String
+  mobile           String       @unique
+  countryShortCode String
+  countryCode      String
+  email            String       @unique
+  dob              DateTime
+  gender           GenderEnum
+  dateOfJoing      DateTime
+  address          String?
+  notes            String?
+  createdAt        DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime     @updatedAt @db.Timestamptz(6)
+  deleted          DateTime?    @db.Timestamptz(6)
+  plans            MemberPlan[]
+}
+
+model MemberPlan {
+  id            String              @id @default(uuid()) @db.Uuid
+  memberId      String              @db.Uuid
+  member        Member              @relation(fields: [memberId], references: [id])
+  planId        String              @db.Uuid
+  plan          Plan                @relation(fields: [planId], references: [id])
+  batchId       String              @db.Uuid
+  batch         Batch               @relation(fields: [batchId], references: [id])
+  startDate     DateTime            @db.Timestamptz(6)
+  trainingType  TrainingTypeEnum
+  admissionFees Float
+  discount      Float
+  discountType  DiscountTypeEnum
+  createdAt     DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime            @updatedAt @db.Timestamptz(6)
+  deleted       DateTime?           @db.Timestamptz(6)
+  payments      MemberPlanPayment[]
+}
+
+model MemberPlanPayment {
+  id           String     @id @default(uuid()) @db.Uuid
+  amountPaid   Float
+  memberPlanId String     @db.Uuid
+  memberPlan   MemberPlan @relation(fields: [memberPlanId], references: [id])
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
+  deleted      DateTime?  @db.Timestamptz(6)
 }
