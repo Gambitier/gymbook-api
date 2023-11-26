@@ -1,6 +1,7 @@
 import { GenderEnum } from '@modules/user/enums/gender.enum';
 import { UserPrefixEnum } from '@modules/user/enums/user.prefix.enum';
 import { $Enums } from '@prisma/client';
+import { UserRoleEntity } from 'src/prisma/entity/userRole';
 
 export type UserEntity = {
   id: string;
@@ -16,4 +17,5 @@ export type UserEntity = {
   createdAt: Date;
   updatedAt: Date;
   deleted: Date;
+  UserRoles?: UserRoleEntity[];
 };

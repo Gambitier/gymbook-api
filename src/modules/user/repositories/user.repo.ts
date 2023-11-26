@@ -10,7 +10,6 @@ import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma.service';
 import { UserEntity } from 'src/prisma/entity/user';
-import { UserRoleEntity } from 'src/prisma/entity/userRole';
 
 /////////////////////////////////////////////////////
 
@@ -52,13 +51,13 @@ export class UserRepository implements IUserRepository {
 
   async findFirstByIdOrThrow(userId: string): Promise<UserDomainModel> {
     try {
-      const entity = await this._userEntity.findFirstOrThrow({
+      const entity: UserEntity = await this._userEntity.findFirstOrThrow({
         where: {
           id: userId,
           deleted: null,
         },
         include: {
-          UserRoles: true,
+          userRoles: true,
         },
       });
       return this.getUserDomainModel(entity);
@@ -69,13 +68,13 @@ export class UserRepository implements IUserRepository {
 
   async findFirstByEmailOrThrow(email: string): Promise<UserDomainModel> {
     try {
-      const entity = await this._userEntity.findFirstOrThrow({
+      const entity: UserEntity = await this._userEntity.findFirstOrThrow({
         where: {
           email: email,
           deleted: null,
         },
         include: {
-          UserRoles: true,
+          userRoles: true,
         },
       });
       return this.getUserDomainModel(entity);
@@ -93,7 +92,7 @@ export class UserRepository implements IUserRepository {
 
     const data: Prisma.UserCreateInput = {
       ...model,
-      UserRoles: {
+      userRoles: {
         createMany: {
           data: rolesData,
         },
@@ -104,7 +103,7 @@ export class UserRepository implements IUserRepository {
       const entity = await this._userEntity.create({
         data: data,
         include: {
-          UserRoles: true,
+          userRoles: true,
         },
       });
       return this.getUserDomainModel(entity);
@@ -113,11 +112,7 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  private getUserDomainModel(
-    entity: {
-      UserRoles: UserRoleEntity[];
-    } & UserEntity,
-  ) {
+  private getUserDomainModel(entity: UserEntity) {
     const domainModel: UserDomainModel = entity;
     return domainModel;
   }

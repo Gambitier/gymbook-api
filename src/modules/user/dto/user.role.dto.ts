@@ -13,7 +13,7 @@ export class UserRoleDto {
 
   @ApiProperty({ enum: UserRoleEnum })
   @Expose()
-  role: UserRoleEnum;
+  role: string | UserRoleEnum;
 
   @ApiProperty()
   @Expose()
