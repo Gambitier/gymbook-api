@@ -1,5 +1,6 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
+import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
 import { CreateMemberDto } from '@modules/gym/members/request.dto';
 import {
   Body,
@@ -42,9 +43,7 @@ export class MemeberController {
   @Post(':gymId/members')
   async create(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
     @Body() dto: CreateMemberDto,
   ): Promise<APIResponse> {
     try {
@@ -104,9 +103,7 @@ export class MemeberController {
   @Get(':gymId/members')
   async getAll(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._memberEntity.findMany({
@@ -133,10 +130,7 @@ export class MemeberController {
   @Delete(':gymId/members/:id')
   async delete(
     @Param()
-    params: {
-      gymId: string;
-      id: string;
-    },
+    params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._memberEntity.update({
@@ -166,10 +160,7 @@ export class MemeberController {
   @Get(':gymId/members/:id')
   async getById(
     @Param()
-    params: {
-      gymId: string;
-      id: string;
-    },
+    params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._memberEntity.findFirstOrThrow({
