@@ -1,8 +1,57 @@
 -- CreateEnum
+CREATE TYPE "UserRoleEnum" AS ENUM ('SUPERADMIN', 'ADMIN', 'USER');
+
+-- CreateEnum
+CREATE TYPE "GenderEnum" AS ENUM ('MALE', 'FEMALE', 'OTHER', 'UNSPECIFIED');
+
+-- CreateEnum
 CREATE TYPE "TrainingTypeEnum" AS ENUM ('GENERAL', 'PERSONAL');
 
 -- CreateEnum
 CREATE TYPE "DiscountTypeEnum" AS ENUM ('AMOUNT', 'PERCENTAGE');
+
+-- CreateTable
+CREATE TABLE "UserRole" (
+    "id" UUID NOT NULL,
+    "role" "UserRoleEnum" NOT NULL DEFAULT 'USER',
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(6) NOT NULL,
+    "deleted" TIMESTAMPTZ(6),
+    "userId" UUID NOT NULL,
+
+    CONSTRAINT "UserRole_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" UUID NOT NULL,
+    "prefix" VARCHAR(10) NOT NULL,
+    "firstName" VARCHAR(50) NOT NULL,
+    "middleName" VARCHAR(50),
+    "lastName" VARCHAR(50) NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "gender" "GenderEnum" NOT NULL DEFAULT 'UNSPECIFIED',
+    "dateOfBirth" DATE,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(6) NOT NULL,
+    "deleted" TIMESTAMPTZ(6),
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Gym" (
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL,
+    "userId" UUID NOT NULL,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(6) NOT NULL,
+    "deleted" TIMESTAMPTZ(6),
+
+    CONSTRAINT "Gym_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Batch" (
@@ -96,6 +145,15 @@ CREATE TABLE "MemberPlanPayment" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Gym_name_userId_key" ON "Gym"("name", "userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Batch_startTimeId_key" ON "Batch"("startTimeId");
 
 -- CreateIndex
@@ -106,6 +164,12 @@ CREATE UNIQUE INDEX "Member_mobile_key" ON "Member"("mobile");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Member_email_key" ON "Member"("email");
+
+-- AddForeignKey
+ALTER TABLE "UserRole" ADD CONSTRAINT "UserRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Gym" ADD CONSTRAINT "Gym_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Batch" ADD CONSTRAINT "Batch_gymId_fkey" FOREIGN KEY ("gymId") REFERENCES "Gym"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -4,6 +4,7 @@ import { CreateGymhDto } from '@modules/gym/gym/request.dto';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -56,6 +57,29 @@ export class GymController {
 
       const apiResponse: APIResponse = {
         message: 'Gym created successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('')
+  async getAll(@Request() req): Promise<APIResponse> {
+    try {
+      const entity = await this._entity.findMany({
+        where: {
+          adminUser: {
+            id: req.user.id,
+          },
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Gyms retrieved successfully!',
         data: entity,
       };
 
