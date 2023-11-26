@@ -51,7 +51,7 @@ export class GymController {
       });
 
       const apiResponse: APIResponse = {
-        message: 'Plan created successfully!',
+        message: 'Gym created successfully!',
         data: entity,
       };
 
