@@ -11,7 +11,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma.service';
@@ -19,9 +19,9 @@ import { PrismaService } from 'src/prisma.service';
 /////////////////////////////////////////////////////////////////////////
 
 @ApiBearerAuth()
-@ApiTags('plans')
-@Controller('plans')
-export class PlanController {
+@ApiTags('gyms')
+@Controller('gyms')
+export class GymController {
   /**
    *
    */
@@ -37,10 +37,9 @@ export class PlanController {
   }
 
   @ApiBody({ type: CreatePlanDto })
-  @ApiResponse({ status: HttpStatus.OK })
   @HttpCode(HttpStatus.CREATED)
-  @Post(':gymId')
-  async createPlan(
+  @Post(':gymId/plans')
+  async createGymPlan(
     @Param()
     params: {
       gymId: string;
@@ -70,11 +69,9 @@ export class PlanController {
     }
   }
 
-  @ApiBody({ type: CreatePlanDto })
-  @ApiResponse({ status: HttpStatus.OK })
   @HttpCode(HttpStatus.OK)
-  @Get(':gymId')
-  async getAllPlan(
+  @Get(':gymId/plans')
+  async getAllGymPlans(
     @Param()
     params: {
       gymId: string;
