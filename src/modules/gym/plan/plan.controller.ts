@@ -1,5 +1,6 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
+import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
 import { CreatePlanDto } from '@modules/gym/plan/request.dto';
 import {
   Body,
@@ -43,9 +44,7 @@ export class PlanController {
   @Post(':gymId/plans')
   async createGymPlan(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
     @Body() dto: CreatePlanDto,
   ): Promise<APIResponse> {
     try {
@@ -73,19 +72,16 @@ export class PlanController {
 
   @ApiBody({ type: CreatePlanDto })
   @HttpCode(HttpStatus.OK)
-  @Put(':gymId/plans/:planId')
+  @Put(':gymId/plans/:id')
   async updateGymPlan(
     @Param()
-    params: {
-      gymId: string;
-      planId: string;
-    },
+    params: GymEntityIdParam,
     @Body() dto: CreatePlanDto,
   ): Promise<APIResponse> {
     try {
       const entity = await this._planEntity.update({
         where: {
-          id: params.planId,
+          id: params.id,
           gym: {
             id: params.gymId,
           },
@@ -110,9 +106,7 @@ export class PlanController {
   @Get(':gymId/plans')
   async getAllGymPlans(
     @Param()
-    params: {
-      gymId: string;
-    },
+    params: GymIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._planEntity.findMany({
@@ -136,18 +130,15 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete(':gymId/plans/:planId')
+  @Delete(':gymId/plans/:id')
   async deleteGymPlan(
     @Param()
-    params: {
-      gymId: string;
-      planId: string;
-    },
+    params: GymEntityIdParam,
   ): Promise<APIResponse> {
     try {
       const entity = await this._planEntity.update({
         where: {
-          id: params.planId,
+          id: params.id,
           gym: {
             id: params.gymId,
           },
