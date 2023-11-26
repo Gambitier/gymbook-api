@@ -46,7 +46,11 @@ export class GymController {
       const entity = await this._entity.create({
         data: {
           name: dto.name,
-          adminUser: req.user.id,
+          adminUser: {
+            connect: {
+              id: req.user.id,
+            },
+          },
         },
       });
 
