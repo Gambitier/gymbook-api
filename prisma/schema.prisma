@@ -59,6 +59,8 @@ model Gym {
   batches   Batch[]
   plans     Plan[]
   members   Member[]
+
+  @@unique([name, userId])
 }
 
 model Batch {
