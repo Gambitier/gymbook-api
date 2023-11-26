@@ -1,6 +1,7 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
 import { CreateBatchDto } from '@modules/gym/batch/request.dto';
+import { CreateMemberDto } from '@modules/gym/members/request.dto';
 import {
   Body,
   Controller,
@@ -14,7 +15,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma.service';
 
@@ -28,17 +29,17 @@ export class MemeberController {
    *
    */
 
-  private _batchEntity: Prisma.BatchDelegate<DefaultArgs>;
+  private _memberEntity: Prisma.MemberDelegate<DefaultArgs>;
 
   constructor(
     prismaService: PrismaService,
     @Inject(IDatabaseErrorHandler)
     private _databaseErrorHandler: IDatabaseErrorHandler,
   ) {
-    this._batchEntity = prismaService.batch;
+    this._memberEntity = prismaService.member;
   }
 
-  @ApiBody({ type: CreateBatchDto })
+  @ApiBody({ type: CreateMemberDto })
   @HttpCode(HttpStatus.CREATED)
   @Post(':gymId/batches')
   async create(
@@ -46,28 +47,40 @@ export class MemeberController {
     params: {
       gymId: string;
     },
-    @Body() dto: CreateBatchDto,
+    @Body() dto: CreateMemberDto,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._batchEntity.create({
+      const plan = dto.plans[0];
+
+      const entity = await this._memberEntity.create({
         data: {
-          name: dto.name,
-          batchLimit: dto.batchLimit,
-          startTime: {
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          mobile: dto.mobile,
+          countryShortCode: dto.countryShortCode,
+          countryCode: dto.countryCode,
+          email: dto.email,
+          dob: dto.dob,
+          gender: dto.gender,
+          dateOfJoing: dto.dateOfJoing,
+          address: dto.address,
+          notes: dto.notes,
+          plans: {
             create: {
-              hour: dto.startTime.hour,
-              minute: dto.startTime.minute,
-            },
-          },
-          endTime: {
-            create: {
-              hour: dto.endTime.hour,
-              minute: dto.endTime.minute,
-            },
-          },
-          gym: {
-            connect: {
-              id: params.gymId,
+              planId: plan.planId,
+              batchId: plan.batchId,
+              startDate: plan.startDate,
+              trainingType: plan.trainingType as $Enums.TrainingTypeEnum,
+              admissionFees: plan.admissionFees,
+              discount: plan.discount,
+              discountType: plan.discountType as $Enums.DiscountTypeEnum,
+              payments: {
+                createMany: {
+                  data: plan.payments.map((payment) => ({
+                    amountPaid: payment.amountPaid,
+                  })),
+                },
+              },
             },
           },
         },
@@ -96,7 +109,7 @@ export class MemeberController {
     @Body() dto: CreateBatchDto,
   ): Promise<APIResponse> {
     try {
-      const entity = await this._batchEntity.update({
+      const entity = await this._memberEntity.update({
         where: {
           id: params.id,
           gym: {
@@ -141,7 +154,7 @@ export class MemeberController {
     },
   ): Promise<APIResponse> {
     try {
-      const entity = await this._batchEntity.findMany({
+      const entity = await this._memberEntity.findMany({
         where: {
           gym: {
             id: params.gymId,
@@ -171,7 +184,7 @@ export class MemeberController {
     },
   ): Promise<APIResponse> {
     try {
-      const entity = await this._batchEntity.update({
+      const entity = await this._memberEntity.update({
         where: {
           id: params.id,
           gym: {
