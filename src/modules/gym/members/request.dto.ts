@@ -1,50 +1,87 @@
 import { GenderEnum } from '@modules/user/enums/gender.enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+  ArrayMinSize,
+  IsArray,
   IsDateString,
+  IsDefined,
   IsEmail,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
+  Min,
+  ValidateNested,
 } from 'class-validator';
 
-// model MemberPlan {
-//   id            String              @id @default(uuid()) @db.Uuid
-//   memberId      String              @db.Uuid
-//   member        Member              @relation(fields: [memberId], references: [id])
-//   planId        String              @db.Uuid
-//   plan          Plan                @relation(fields: [planId], references: [id])
-//   batchId       String              @db.Uuid
-//   batch         Batch               @relation(fields: [batchId], references: [id])
-//   startDate     DateTime            @db.Timestamptz(6)
-//   trainingType  TrainingTypeEnum
-//   admissionFees Float
-//   discount      Float
-//   discountType  DiscountTypeEnum
-//   createdAt     DateTime            @default(now()) @db.Timestamptz(6)
-//   updatedAt     DateTime            @updatedAt @db.Timestamptz(6)
-//   deleted       DateTime?           @db.Timestamptz(6)
-//   payments      MemberPlanPayment[]
-// }
+enum TrainingTypeEnum {
+  GENERAL = 'GENERAL',
+  PERSONAL = 'PERSONAL',
+}
 
-// model MemberPlanPayment {
-//   id           String     @id @default(uuid()) @db.Uuid
-//   amountPaid   Float
-//   memberPlanId String     @db.Uuid
-//   memberPlan   MemberPlan @relation(fields: [memberPlanId], references: [id])
-//   createdAt    DateTime   @default(now()) @db.Timestamptz(6)
-//   updatedAt    DateTime   @updatedAt @db.Timestamptz(6)
-//   deleted      DateTime?  @db.Timestamptz(6)
-// }
+enum DiscountTypeEnum {
+  AMOUNT = 'AMOUNT',
+  PERCENTAGE = 'PERCENTAGE',
+}
 
 class MemberPlan {
   constructor(props: MemberPlan) {
     Object.assign(this, props);
   }
 
-  name: string;
+  @ApiProperty({ example: '' })
+  @IsUUID()
+  planId: string;
+
+  @ApiProperty({ example: '' })
+  @IsUUID()
+  batchId: string;
+
+  @ApiProperty({ example: '2022-03-15' })
+  @IsDateString()
+  @Transform(({ value }) => {
+    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return new Date(value);
+    }
+    return value;
+  })
+  startDate: Date;
+
+  @ApiProperty({ enum: TrainingTypeEnum })
+  @IsEnum(TrainingTypeEnum)
+  trainingType: TrainingTypeEnum;
+
+  @ApiProperty({ example: 5000 })
+  admissionFees: number;
+
+  @ApiProperty({ example: 10 })
+  discount: number;
+
+  @ApiProperty({ enum: DiscountTypeEnum })
+  @IsEnum(DiscountTypeEnum)
+  discountType: DiscountTypeEnum;
+
+  @ApiProperty()
+  @IsDefined()
+  @IsArray()
+  @ArrayMinSize(1, { message: 'payments should have a minimum length of 1' })
+  @ValidateNested({ each: true })
+  @Type(() => MemberPlanPayment)
+  payments: MemberPlanPayment[];
+}
+
+class MemberPlanPayment {
+  constructor(props: MemberPlanPayment) {
+    Object.assign(this, props);
+  }
+
+  @ApiProperty({ example: 1200 })
+  @IsNumber()
+  @Min(0)
+  amountPaid: number;
 }
 
 export class CreateMemberDto {
@@ -73,7 +110,7 @@ export class CreateMemberDto {
   @IsString()
   countryCode: string;
 
-  @ApiProperty({ example: '+91' })
+  @ApiProperty({ example: 'test@yopmail.com' })
   @IsString()
   @IsEmail()
   email: string;
@@ -112,5 +149,11 @@ export class CreateMemberDto {
   @IsOptional()
   notes?: string;
 
+  @ApiProperty()
+  @IsDefined()
+  @IsArray()
+  @ArrayMinSize(1, { message: 'plans should have a minimum length of 1' })
+  @ValidateNested({ each: true })
+  @Type(() => MemberPlan)
   plans: MemberPlan[];
 }
