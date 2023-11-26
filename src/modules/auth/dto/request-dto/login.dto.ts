@@ -6,10 +6,10 @@ export class LoginDto {
     Object.assign(this, props);
   }
 
-  @ApiProperty()
+  @ApiProperty({ example: 'user@yopmail.com' })
   @IsString({ message: "'email' must be string" })
   email: string;
 
-  @ApiProperty({ example: 'Password@1234' })
+  @ApiProperty({ example: 'string' })
   password: string;
 }
