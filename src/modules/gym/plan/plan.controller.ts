@@ -4,6 +4,7 @@ import { CreatePlanDto } from '@modules/gym/plan/request.dto';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -83,11 +84,45 @@ export class GymController {
           gym: {
             id: params.gymId,
           },
+          deleted: null,
         },
       });
 
       const apiResponse: APIResponse = {
         message: 'Plans retrieved successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Delete(':gymId/plans/:planId')
+  async deleteGymPlan(
+    @Param()
+    params: {
+      gymId: string;
+      planId: string;
+    },
+  ): Promise<APIResponse> {
+    try {
+      const entity = await this._planEntity.update({
+        where: {
+          id: params.planId,
+          gym: {
+            id: params.gymId,
+          },
+        },
+        data: {
+          deleted: new Date(),
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Plan deleted successfully!',
         data: entity,
       };
 
