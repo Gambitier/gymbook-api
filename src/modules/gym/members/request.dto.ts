@@ -55,9 +55,11 @@ class MemberPlan {
   trainingType: TrainingTypeEnum;
 
   @ApiProperty({ example: 5000 })
+  @IsNumber()
   admissionFees: number;
 
   @ApiProperty({ example: 10 })
+  @IsNumber()
   discount: number;
 
   @ApiProperty({ enum: DiscountTypeEnum })
