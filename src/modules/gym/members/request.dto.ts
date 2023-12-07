@@ -4,7 +4,7 @@ import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
-  IsDateString,
+  IsDate,
   IsDefined,
   IsEmail,
   IsEnum,
@@ -41,7 +41,7 @@ class MemberPlan {
   batchId: string;
 
   @ApiProperty({ example: '2022-03-15' })
-  @IsDateString()
+  @IsDate()
   @Transform(({ value }) => {
     if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return new Date(value);
@@ -119,7 +119,7 @@ export class CreateMemberDto {
   email: string;
 
   @ApiProperty({ example: '1995-03-15' })
-  @IsDateString()
+  @IsDate()
   @Transform(({ value }) => {
     if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return new Date(value);
@@ -133,7 +133,7 @@ export class CreateMemberDto {
   gender: GenderEnum = GenderEnum.UNSPECIFIED;
 
   @ApiProperty({ example: '2022-03-15' })
-  @IsDateString()
+  @IsDate()
   @Transform(({ value }) => {
     if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return new Date(value);
