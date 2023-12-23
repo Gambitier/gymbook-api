@@ -104,7 +104,7 @@ export class CreateMemberDto {
 
   @ApiProperty({ example: '912456789' })
   @IsString()
-  @MaxLength(9)
+  @MaxLength(10)
   mobile: string;
 
   @ApiProperty({ example: 'IN' })
