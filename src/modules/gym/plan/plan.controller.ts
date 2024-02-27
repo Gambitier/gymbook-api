@@ -130,6 +130,33 @@ export class PlanController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Get(':gymId/plans/:id')
+  async getGymPlanById(
+    @Param()
+    params: GymEntityIdParam,
+  ): Promise<APIResponse> {
+    try {
+      const entity = await this._planEntity.findFirst({
+        where: {
+          id: params.id,
+          gym: {
+            id: params.gymId,
+          },
+        },
+      });
+
+      const apiResponse: APIResponse = {
+        message: 'Plan by id fetched successfully!',
+        data: entity,
+      };
+
+      return apiResponse;
+    } catch (err) {
+      this._databaseErrorHandler.HandleError(err);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Delete(':gymId/plans/:id')
   async deleteGymPlan(
     @Param()
