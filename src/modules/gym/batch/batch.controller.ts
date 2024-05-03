@@ -1,7 +1,11 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
 import { CreateBatchDto } from '@modules/gym/batch/request.dto';
-import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
+import {
+  GymEntityIdParam,
+  GymIdParam,
+  PaginationDto,
+} from '@modules/gym/common/dto';
 import {
   Body,
   Controller,
@@ -13,6 +17,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
@@ -133,6 +138,7 @@ export class BatchController {
   async getAll(
     @Param()
     params: GymIdParam,
+    @Query() paginationDto: PaginationDto,
   ): Promise<APIResponse> {
     try {
       const entity = await this._batchEntity.findMany({
@@ -142,6 +148,8 @@ export class BatchController {
           },
           deleted: null,
         },
+        skip: paginationDto.offset,
+        take: paginationDto.limit,
       });
 
       const apiResponse: APIResponse = {

@@ -1,6 +1,10 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
-import { GymEntityIdParam, GymIdParam } from '@modules/gym/common/dto';
+import {
+  GymEntityIdParam,
+  GymIdParam,
+  PaginationDto,
+} from '@modules/gym/common/dto';
 import { CreatePlanDto } from '@modules/gym/plan/request.dto';
 import {
   Body,
@@ -13,6 +17,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
@@ -107,6 +112,7 @@ export class PlanController {
   async getAllGymPlans(
     @Param()
     params: GymIdParam,
+    @Query() paginationDto: PaginationDto,
   ): Promise<APIResponse> {
     try {
       const entity = await this._planEntity.findMany({
@@ -116,6 +122,8 @@ export class PlanController {
           },
           deleted: null,
         },
+        skip: paginationDto.offset,
+        take: paginationDto.limit,
       });
 
       const apiResponse: APIResponse = {

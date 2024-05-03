@@ -1,5 +1,6 @@
 import { APIResponse } from '@common/types';
 import { IDatabaseErrorHandler } from '@modules/database-error-handler/database.error.handler.interface';
+import { PaginationDto } from '@modules/gym/common/dto';
 import { CreateGymhDto } from '@modules/gym/gym/request.dto';
 import {
   Body,
@@ -9,6 +10,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  Query,
   Request,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
@@ -68,7 +70,10 @@ export class GymController {
 
   @HttpCode(HttpStatus.OK)
   @Get('')
-  async getAll(@Request() req): Promise<APIResponse> {
+  async getAll(
+    @Request() req,
+    @Query() paginationDto: PaginationDto,
+  ): Promise<APIResponse> {
     try {
       const entity = await this._entity.findMany({
         where: {
@@ -76,6 +81,8 @@ export class GymController {
             id: req.user.id,
           },
         },
+        skip: paginationDto.offset,
+        take: paginationDto.limit,
       });
 
       const apiResponse: APIResponse = {
