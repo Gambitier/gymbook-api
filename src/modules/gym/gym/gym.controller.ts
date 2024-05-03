@@ -82,7 +82,7 @@ export class GymController {
           },
         },
         skip: paginationDto.offset,
-        take: paginationDto.limit,
+        take: paginationDto.pageSize,
       });
 
       const count = await this._entity.findMany({
@@ -92,7 +92,7 @@ export class GymController {
           },
         },
         skip: paginationDto.offset,
-        take: paginationDto.limit,
+        take: paginationDto.pageSize,
       });
 
       const apiResponse: APIResponse = {

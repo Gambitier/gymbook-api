@@ -123,7 +123,7 @@ export class PlanController {
           deleted: null,
         },
         skip: paginationDto.offset,
-        take: paginationDto.limit,
+        take: paginationDto.pageSize,
       });
 
       const count = await this._planEntity.count({

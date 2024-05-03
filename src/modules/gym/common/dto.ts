@@ -21,16 +21,16 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   @Type(() => Number)
-  readonly page?: number = 1;
+  readonly pageIndex?: number = 1;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsInt()
   @Min(1)
   @Type(() => Number)
-  readonly limit?: number = 10;
+  readonly pageSize?: number = 10;
 
   get offset(): number {
-    return (this.page - 1) * this.limit;
+    return (this.pageIndex - 1) * this.pageSize;
   }
 }

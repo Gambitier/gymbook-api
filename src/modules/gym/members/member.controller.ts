@@ -120,7 +120,7 @@ export class MemeberController {
           deleted: null,
         },
         skip: paginationDto.offset,
-        take: paginationDto.limit,
+        take: paginationDto.pageSize,
       });
 
       const count = await this._memberEntity.findMany({

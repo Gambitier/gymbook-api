@@ -149,7 +149,7 @@ export class BatchController {
           deleted: null,
         },
         skip: paginationDto.offset,
-        take: paginationDto.limit,
+        take: paginationDto.pageSize,
       });
 
       const count = await this._batchEntity.findMany({
