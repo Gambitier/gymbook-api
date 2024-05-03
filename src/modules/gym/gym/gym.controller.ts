@@ -85,9 +85,22 @@ export class GymController {
         take: paginationDto.limit,
       });
 
+      const count = await this._entity.findMany({
+        where: {
+          adminUser: {
+            id: req.user.id,
+          },
+        },
+        skip: paginationDto.offset,
+        take: paginationDto.limit,
+      });
+
       const apiResponse: APIResponse = {
         message: 'Gyms retrieved successfully!',
-        data: entity,
+        data: {
+          records: entity,
+          totalRecords: count,
+        },
       };
 
       return apiResponse;

@@ -123,9 +123,21 @@ export class MemeberController {
         take: paginationDto.limit,
       });
 
+      const count = await this._memberEntity.findMany({
+        where: {
+          gym: {
+            id: params.gymId,
+          },
+          deleted: null,
+        },
+      });
+
       const apiResponse: APIResponse = {
         message: 'members retrieved successfully!',
-        data: entity,
+        data: {
+          records: entity,
+          totalRecords: count,
+        },
       };
 
       return apiResponse;

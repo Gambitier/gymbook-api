@@ -152,9 +152,21 @@ export class BatchController {
         take: paginationDto.limit,
       });
 
+      const count = await this._batchEntity.findMany({
+        where: {
+          gym: {
+            id: params.gymId,
+          },
+          deleted: null,
+        },
+      });
+
       const apiResponse: APIResponse = {
         message: 'Plans retrieved successfully!',
-        data: entity,
+        data: {
+          records: entity,
+          totalRecords: count,
+        },
       };
 
       return apiResponse;
