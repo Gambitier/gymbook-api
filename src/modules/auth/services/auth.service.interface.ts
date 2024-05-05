@@ -16,6 +16,8 @@ import { UserDto } from '@modules/user/dto';
 export const IAuthService = Symbol('IAuthService');
 
 export interface IAuthService {
+  me(jwtUserData: JwtUserDataDto): Promise<UserDomainModel>;
+
   signup(
     signupDto: SignupDto,
   ): Promise<{ user: UserDomainModel; token: TokenDto }>;

@@ -19,6 +19,7 @@ import { UserDomainModel } from '@modules/user/domain.types/user';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -174,6 +175,20 @@ export class AuthController {
     const apiResponse: APIResponse = {
       message: 'Password updated successfully!',
       data: status,
+    };
+
+    return apiResponse;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('me')
+  async getAll(@Request() req): Promise<APIResponse> {
+    const user = req.user as JwtUserDataDto;
+    const userDomainModel = await this.authService.me(user);
+    delete userDomainModel.password;
+    const apiResponse: APIResponse<UserDomainModel> = {
+      message: 'User info retrieved successfully!',
+      data: userDomainModel,
     };
 
     return apiResponse;

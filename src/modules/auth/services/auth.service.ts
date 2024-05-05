@@ -42,6 +42,14 @@ export class AuthService implements IAuthService {
     //
   }
 
+  async me(jwtUserData: JwtUserDataDto): Promise<UserDomainModel> {
+    const user: UserDomainModel = await this.userService.findFirstByIdOrThrow(
+      jwtUserData.id,
+    );
+
+    return user;
+  }
+
   async signup(
     signupDto: SignupDto,
   ): Promise<{ user: UserDomainModel; token: TokenDto }> {
