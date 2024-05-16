@@ -85,7 +85,7 @@ export class GymController {
         take: paginationDto.pageSize,
       });
 
-      const count = await this._entity.findMany({
+      const count = await this._entity.count({
         where: {
           adminUser: {
             id: req.user.id,

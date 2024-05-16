@@ -150,9 +150,13 @@ export class BatchController {
         },
         skip: paginationDto.offset,
         take: paginationDto.pageSize,
+        include: {
+          startTime: true,
+          endTime: true,
+        },
       });
 
-      const count = await this._batchEntity.findMany({
+      const count = await this._batchEntity.count({
         where: {
           gym: {
             id: params.gymId,

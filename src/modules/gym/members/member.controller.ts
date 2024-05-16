@@ -123,7 +123,7 @@ export class MemeberController {
         take: paginationDto.pageSize,
       });
 
-      const count = await this._memberEntity.findMany({
+      const count = await this._memberEntity.count({
         where: {
           gym: {
             id: params.gymId,
